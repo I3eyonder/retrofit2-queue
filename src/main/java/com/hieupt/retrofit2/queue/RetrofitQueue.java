@@ -94,7 +94,7 @@ public final class RetrofitQueue {
         }
     }
 
-    public <T> void enqueueNow(Call<T> request, Callback<T> callback) {
+    public <T> void requestNow(Call<T> request, Callback<T> callback) {
         if (request != null) {
             request.enqueue(new CallbackWrapper<>(callback));
         }
