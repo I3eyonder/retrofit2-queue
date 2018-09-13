@@ -1,28 +1,14 @@
-package com.hieupt.retrofit2.queue;
+package com.hieupt.retrofit2;
 
-import com.hieupt.retrofit2.CallbackWrapper;
 import com.hieupt.utils.Counter;
 
-import java.io.IOException;
 import java.util.LinkedList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.HttpException;
 import retrofit2.Response;
 
 public final class RetrofitQueue {
-
-    public interface SyncRequestCallback<T> {
-
-        default void onResponse(Call<T> request, T responseData) {
-
-        }
-
-        default void onFailure(Call<T> request, Throwable throwable) {
-
-        }
-    }
 
     public static final int DEFAULT_MAX_REQUEST_ACTIVE = 1;
 
@@ -98,32 +84,6 @@ public final class RetrofitQueue {
         if (request != null) {
             request.enqueue(new CallbackWrapper<>(callback));
         }
-    }
-
-    public <T> T executeRequestSync(Call<T> request) {
-        return executeRequestSync(request, null);
-    }
-
-    public <T> T executeRequestSync(Call<T> request, SyncRequestCallback<T> callback) {
-        if (request != null) {
-            try {
-                Response<T> response = request.execute();
-                T responseData = response.body();
-                if (callback != null) {
-                    if (response.isSuccessful()) {
-                        callback.onResponse(request, responseData);
-                    } else {
-                        callback.onFailure(request, new HttpException(response));
-                    }
-                }
-                return responseData;
-            } catch (IOException e) {
-                if (callback != null) {
-                    callback.onFailure(request, e);
-                }
-            }
-        }
-        return null;
     }
 
     private final class Request<T> {
