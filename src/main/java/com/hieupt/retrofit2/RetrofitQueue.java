@@ -124,7 +124,7 @@ public final class RetrofitQueue {
 
         private void performNextRequest() {
             activeCounter.decrease();
-            if (!requestQueue.isEmpty()) {
+            if (activeCounter.canIncrease() && !requestQueue.isEmpty()) {
                 Request<?> request = requestQueue.peek();
                 request.execute();
             }
