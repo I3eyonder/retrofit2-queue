@@ -19,10 +19,23 @@ public final class RetrofitRequestSync {
         }
     }
 
+    /**
+     * Execute request on current thread
+     *
+     * @param <T> Type of response data
+     * @return {@code T} or null if request failure
+     */
     public static <T> T executeRequest(Call<T> request) {
         return executeRequest(request, null);
     }
 
+    /**
+     * Execute request on current thread
+     *
+     * @param callback Callback for success or failure response
+     * @param <T>      Type of response data
+     * @return {@code T} or null if request failure
+     */
     public static <T> T executeRequest(Call<T> request, SyncRequestCallback<T> callback) {
         if (request != null) {
             try {

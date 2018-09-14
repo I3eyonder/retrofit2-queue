@@ -25,6 +25,9 @@ public final class RetrofitQueue {
         this.activeCounter = new Counter(calculateMaxActiveRequest(maxActiveRequest));
     }
 
+    /**
+     * @return Current max active request number
+     */
     public synchronized int getMaxActiveRequest() {
         return activeCounter.getMax();
     }
@@ -37,6 +40,12 @@ public final class RetrofitQueue {
         return calculated;
     }
 
+    /**
+     * Update max active request number and execute pending request if current active number lesser than max active request number
+     *
+     * @param maxActiveRequest Max active request number
+     * @throws IllegalArgumentException If maxActiveRequest is lesser than 0
+     */
     public synchronized void updateMaxActiveRequest(int maxActiveRequest) {
         activeCounter.setMax(calculateMaxActiveRequest(maxActiveRequest));
         executeRemainAcceptableRequests();
@@ -64,6 +73,9 @@ public final class RetrofitQueue {
         return null;
     }
 
+    /**
+     * Add request to queue. Execute immediately if current active < max active
+     */
     public synchronized <T> void addRequest(Call<T> request, Callback<T> callback) {
         if (request != null) {
             Request<T> requestWrap = new Request<>(request, callback);
@@ -72,6 +84,9 @@ public final class RetrofitQueue {
         }
     }
 
+    /**
+     * Add request to front of queue. Execute immediately if current active < max active
+     */
     public synchronized <T> void addRequestToFrontQueue(Call<T> request, Callback<T> callback) {
         if (request != null) {
             Request<T> requestWrap = new Request<>(request, callback);
@@ -80,6 +95,9 @@ public final class RetrofitQueue {
         }
     }
 
+    /**
+     * Execute request immediately
+     */
     public synchronized <T> void requestNow(Call<T> request, Callback<T> callback) {
         if (request != null) {
             request.enqueue(new CallbackWrapper<>(callback));

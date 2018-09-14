@@ -2,6 +2,9 @@ package com.hieupt.retrofit2;
 
 public final class RetrofitQueueSingleton {
 
+    /**
+     * @return singleton instance of {@link RetrofitQueue}
+     */
     public static RetrofitQueue getInstance() {
         return InstanceHolder.INSTANCE;
     }
