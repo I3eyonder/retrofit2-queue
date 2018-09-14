@@ -43,7 +43,7 @@ public final class RetrofitQueue {
     }
 
     private void executeRemainAcceptableRequests() {
-        while (activeCounter.canIncrease()) {
+        while (!requestQueue.isEmpty() && activeCounter.canIncrease()) {
             tryToExecuteNextRequest();
         }
     }
