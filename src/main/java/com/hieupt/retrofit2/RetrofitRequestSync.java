@@ -22,7 +22,8 @@ public final class RetrofitRequestSync {
     /**
      * Execute request on current thread
      *
-     * @param <T> Type of response data
+     * @param request request call
+     * @param <T>     Type of response data
      * @return {@code T} or null if request failure
      */
     public static <T> T executeRequest(Call<T> request) {
@@ -32,6 +33,7 @@ public final class RetrofitRequestSync {
     /**
      * Execute request on current thread
      *
+     * @param request  request call
      * @param callback Callback for success or failure response
      * @param <T>      Type of response data
      * @return {@code T} or null if request failure

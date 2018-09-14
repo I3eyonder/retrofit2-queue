@@ -72,7 +72,11 @@ public final class RetrofitQueue {
     }
 
     /**
-     * Add request to queue. Execute immediately if current active < max active
+     * Add request to queue. Execute immediately if current active lesser max active
+     *
+     * @param request  request call
+     * @param callback callback
+     * @param <T>      Type of response data
      */
     public synchronized <T> void addRequest(Call<T> request, Callback<T> callback) {
         if (request != null) {
@@ -83,7 +87,11 @@ public final class RetrofitQueue {
     }
 
     /**
-     * Add request to front of queue. Execute immediately if current active < max active
+     * Add request to front of queue. Execute immediately if current active lesser max active
+     *
+     * @param request  request call
+     * @param callback callback
+     * @param <T>      Type of response data
      */
     public synchronized <T> void addRequestToFrontQueue(Call<T> request, Callback<T> callback) {
         if (request != null) {
@@ -95,6 +103,10 @@ public final class RetrofitQueue {
 
     /**
      * Execute request immediately
+     *
+     * @param request  request call
+     * @param callback callback
+     * @param <T>      Type of response data
      */
     public synchronized <T> void requestNow(Call<T> request, Callback<T> callback) {
         if (request != null) {
