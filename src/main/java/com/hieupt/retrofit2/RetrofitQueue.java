@@ -25,7 +25,7 @@ public final class RetrofitQueue {
         this.activeCounter = new Counter(calculateMaxActiveRequest(maxActiveRequest));
     }
 
-    public int getMaxActiveRequest() {
+    public synchronized int getMaxActiveRequest() {
         return activeCounter.getMax();
     }
 
@@ -37,7 +37,7 @@ public final class RetrofitQueue {
         return calculated;
     }
 
-    public void updateMaxActiveRequest(int maxActiveRequest) {
+    public synchronized void updateMaxActiveRequest(int maxActiveRequest) {
         activeCounter.setMax(calculateMaxActiveRequest(maxActiveRequest));
         executeRemainAcceptableRequests();
     }
@@ -64,7 +64,7 @@ public final class RetrofitQueue {
         return null;
     }
 
-    public <T> void addRequest(Call<T> request, Callback<T> callback) {
+    public synchronized <T> void addRequest(Call<T> request, Callback<T> callback) {
         if (request != null) {
             Request<T> requestWrap = new Request<>(request, callback);
             requestQueue.add(requestWrap);
@@ -72,7 +72,7 @@ public final class RetrofitQueue {
         }
     }
 
-    public <T> void addRequestToFrontQueue(Call<T> request, Callback<T> callback) {
+    public synchronized <T> void addRequestToFrontQueue(Call<T> request, Callback<T> callback) {
         if (request != null) {
             Request<T> requestWrap = new Request<>(request, callback);
             requestQueue.addFirst(requestWrap);
@@ -80,7 +80,7 @@ public final class RetrofitQueue {
         }
     }
 
-    public <T> void requestNow(Call<T> request, Callback<T> callback) {
+    public synchronized <T> void requestNow(Call<T> request, Callback<T> callback) {
         if (request != null) {
             request.enqueue(new CallbackWrapper<>(callback));
         }
@@ -126,7 +126,9 @@ public final class RetrofitQueue {
             activeCounter.decrease();
             if (activeCounter.canIncrease() && !requestQueue.isEmpty()) {
                 Request<?> request = requestQueue.peek();
-                request.execute();
+                if (request != null) {
+                    request.execute();
+                }
             }
         }
     }
