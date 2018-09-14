@@ -1,7 +1,5 @@
 package com.hieupt.retrofit2;
 
-import com.hieupt.utils.Counter;
-
 import java.util.LinkedList;
 
 import retrofit2.Call;
@@ -12,7 +10,7 @@ public final class RetrofitQueue {
 
     public static final int DEFAULT_MAX_REQUEST_ACTIVE = 1;
 
-    private final Counter activeCounter;
+    private final FixedSizeArrayList<Request<?>> activeList;
 
     private final LinkedList<Request<?>> requestQueue;
 
@@ -22,14 +20,14 @@ public final class RetrofitQueue {
 
     public RetrofitQueue(int maxActiveRequest) {
         this.requestQueue = new LinkedList<>();
-        this.activeCounter = new Counter(calculateMaxActiveRequest(maxActiveRequest));
+        this.activeList = new FixedSizeArrayList<>(calculateMaxActiveRequest(maxActiveRequest));
     }
 
     /**
      * @return Current max active request number
      */
     public synchronized int getMaxActiveRequest() {
-        return activeCounter.getMax();
+        return activeList.getMaxSize();
     }
 
     private int calculateMaxActiveRequest(int maxActiveRequest) {
@@ -47,18 +45,18 @@ public final class RetrofitQueue {
      * @throws IllegalArgumentException If maxActiveRequest is lesser than 0
      */
     public synchronized void updateMaxActiveRequest(int maxActiveRequest) {
-        activeCounter.setMax(calculateMaxActiveRequest(maxActiveRequest));
+        activeList.setMaxSize(calculateMaxActiveRequest(maxActiveRequest));
         executeRemainAcceptableRequests();
     }
 
     private void executeRemainAcceptableRequests() {
-        while (!requestQueue.isEmpty() && activeCounter.canIncrease()) {
+        while (!requestQueue.isEmpty() && activeList.canAdd()) {
             tryToExecuteNextRequest();
         }
     }
 
     private void tryToExecuteNextRequest() {
-        if (activeCounter.canIncrease()) {
+        if (activeList.canAdd()) {
             Request<?> request = getFirstPendingRequest();
             if (request != null) {
                 request.execute();
@@ -100,8 +98,38 @@ public final class RetrofitQueue {
      */
     public synchronized <T> void requestNow(Call<T> request, Callback<T> callback) {
         if (request != null) {
-            request.enqueue(new CallbackWrapper<>(callback));
+            request.enqueue(new CallbackWrapperDelegate<>(callback));
         }
+    }
+
+    /**
+     * Remove {@code request} from pending queue
+     *
+     * @param request Request need to remove
+     */
+    public synchronized void removeRequest(Call<?> request) {
+        if (request != null) {
+            requestQueue.removeIf(requestWrap -> requestWrap != null && requestWrap.request == request);
+        }
+    }
+
+    /**
+     * Clear request queue. Executing request do not affect by this call.
+     */
+    public synchronized void clearQueue() {
+        requestQueue.clear();
+    }
+
+    /**
+     * Cancel all activating request and removes all pending request from queue
+     */
+    public synchronized void cancel() {
+        activeList.forEach(request -> {
+            if (request != null) {
+                request.cancel();
+            }
+        });
+        clearQueue();
     }
 
     private final class Request<T> {
@@ -116,33 +144,40 @@ public final class RetrofitQueue {
         }
 
         private void execute() {
-            activeCounter.increase();
+            activeList.add(this);
             requestQueue.remove(this);
-            request.enqueue(new CallbackDecorator<>(callback));
+            request.enqueue(new CallbackDecorator<>(this));
+        }
+
+        private void cancel() {
+            request.cancel();
         }
     }
 
-    private final class CallbackDecorator<T> extends CallbackWrapper<T> {
+    private final class CallbackDecorator<T> extends CallbackWrapperDelegate<T> {
 
-        private CallbackDecorator(Callback<T> callback) {
-            super(callback);
+        private final Request<T> request;
+
+        private CallbackDecorator(Request<T> request) {
+            super(request.callback);
+            this.request = request;
         }
 
         @Override
-        public void onResponse(Call<T> call, Response<T> response) {
-            super.onResponse(call, response);
+        public void onResponse(Call<T> call, Response<T> response, T responseData) {
+            super.onResponse(call, response, responseData);
             performNextRequest();
         }
 
         @Override
-        public void onFailure(Call<T> call, Throwable t) {
-            super.onFailure(call, t);
+        public void onFailure(Call<T> call, boolean isCanceled, Throwable t) {
+            super.onFailure(call, isCanceled, t);
             performNextRequest();
         }
 
         private void performNextRequest() {
-            activeCounter.decrease();
-            if (activeCounter.canIncrease() && !requestQueue.isEmpty()) {
+            activeList.remove(request);
+            if (activeList.canAdd() && !requestQueue.isEmpty()) {
                 Request<?> request = requestQueue.peek();
                 if (request != null) {
                     request.execute();

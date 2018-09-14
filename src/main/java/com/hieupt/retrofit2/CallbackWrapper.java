@@ -4,29 +4,19 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CallbackWrapper<T> implements Callback<T> {
+public abstract class CallbackWrapper<T> implements Callback<T> {
 
-    private final Callback<T> delegateCallback;
-
-    public CallbackWrapper(Callback<T> callback) {
-        this.delegateCallback = callback;
-    }
-
-    public Callback<T> getDelegateCallback() {
-        return delegateCallback;
+    @Override
+    public final void onResponse(Call<T> call, Response<T> response) {
+        onResponse(call, response, response.body());
     }
 
     @Override
-    public void onResponse(Call<T> call, Response<T> response) {
-        if (delegateCallback != null) {
-            delegateCallback.onResponse(call, response);
-        }
+    public final void onFailure(Call<T> call, Throwable t) {
+        onFailure(call, call.isCanceled(), t);
     }
 
-    @Override
-    public void onFailure(Call<T> call, Throwable t) {
-        if (delegateCallback != null) {
-            delegateCallback.onFailure(call, t);
-        }
-    }
+    public abstract void onResponse(Call<T> call, Response<T> response, T responseData);
+
+    public abstract void onFailure(Call<T> call, boolean isCanceled, Throwable t);
 }
