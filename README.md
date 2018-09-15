@@ -4,6 +4,8 @@ The library supports retrofit2 request execution sequentially.
 Kotlin version is <a href="https://github.com/hieupham1993/retrofit2-queue-kotlin">here</a>
 
 ## Installation
+************* **Using Gradle** *************
+
 Add repository:
 ```groovy
 repositories {
@@ -23,13 +25,22 @@ Add this in your app's build.gradle file:
 **For Gradle < 3.4**
 
 ```groovy
-compile 'com.hieupt:retrofit2-queue:1.0'
+compile 'com.hieupt:retrofit2-queue:1.0.1'
 ```
 
 **For Gradle >= 3.4**
 
+```xml
+implementation 'com.hieupt:retrofit2-queue:1.0.1'
+```
+************* **Using Maven** *************
 ```groovy
-implementation 'com.hieupt:retrofit2-queue:1.0'
+<dependency>
+  <groupId>com.hieupt</groupId>
+  <artifactId>retrofit2-queue</artifactId>
+  <version>1.0.1</version>
+  <type>pom</type>
+</dependency>
 ```
 ## Usage
 **Create RetrofitQueue instance**
