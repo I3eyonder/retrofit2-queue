@@ -30,11 +30,11 @@ compile 'com.hieupt:retrofit2-queue:1.0.1'
 
 **For Gradle >= 3.4**
 
-```xml
+```groovy
 implementation 'com.hieupt:retrofit2-queue:1.0.1'
 ```
 ************* **Using Maven** *************
-```groovy
+```xml
 <dependency>
   <groupId>com.hieupt</groupId>
   <artifactId>retrofit2-queue</artifactId>
