@@ -1,7 +1,7 @@
 # retrofit2-queue
 The library supports retrofit2 request execution sequentially.
 
-##Installation
+## Installation
 Add repository:
 ```groovy
 repositories {
@@ -29,7 +29,7 @@ compile 'com.hieupt:retrofit2-queue:1.0'
 ```groovy
 implementation 'com.hieupt:retrofit2-queue:1.0'
 ```
-##Usage
+## Usage
 **Create RetrofitQueue instance**
 ```java
 // new instance
