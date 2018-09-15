@@ -1,6 +1,8 @@
 # retrofit2-queue
 The library supports retrofit2 request execution sequentially.
 
+Kotlin version is <a href="https://github.com/hieupham1993/retrofit2-queue-kotlin">here</a>
+
 ## Installation
 Add repository:
 ```groovy
