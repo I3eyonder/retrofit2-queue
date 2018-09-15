@@ -133,7 +133,22 @@ public final class RetrofitQueue {
     }
 
     /**
-     * Cancel all activating request and removes all pending request from queue
+     * Cancel {@code request} if it is activating
+     *
+     * @param request Request need to cancel
+     */
+    public synchronized void cancel(Call<?> request) {
+        if (request != null) {
+            Request<?> requestWrap = activeList.stream().filter(r -> r.request == request).findFirst().orElse(null);
+            if (requestWrap != null) {
+                requestWrap.cancel();
+                activeList.remove(requestWrap);
+            }
+        }
+    }
+
+    /**
+     * Cancel all activating requests.
      */
     public synchronized void cancel() {
         activeList.forEach(request -> {
@@ -141,6 +156,14 @@ public final class RetrofitQueue {
                 request.cancel();
             }
         });
+        activeList.clear();
+    }
+
+    /**
+     * Cancel all activating requests and clear pending request queue also.
+     */
+    public synchronized void cancelAndClear() {
+        cancel();
         clearQueue();
     }
 
