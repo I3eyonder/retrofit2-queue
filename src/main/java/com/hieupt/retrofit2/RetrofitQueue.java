@@ -115,17 +115,6 @@ public final class RetrofitQueue {
     }
 
     /**
-     * Remove {@code request} from pending queue
-     *
-     * @param request Request need to remove
-     */
-    public synchronized void removeRequest(Call<?> request) {
-        if (request != null) {
-            requestQueue.removeIf(requestWrap -> requestWrap != null && requestWrap.request == request);
-        }
-    }
-
-    /**
      * Clear request queue. Executing request do not affect by this call.
      */
     public synchronized void clearQueue() {
@@ -133,16 +122,19 @@ public final class RetrofitQueue {
     }
 
     /**
-     * Cancel {@code request} if it is activating
+     * Remove a {@code request} from pending queue or cancel that if it is activating
      *
-     * @param request Request need to cancel
+     * @param request Request need to remove/cancel
      */
     public synchronized void cancel(Call<?> request) {
         if (request != null) {
-            Request<?> requestWrap = activeList.stream().filter(r -> r.request == request).findFirst().orElse(null);
-            if (requestWrap != null) {
-                requestWrap.cancel();
-                activeList.remove(requestWrap);
+            boolean removeSuccess = requestQueue.removeIf(requestWrap -> requestWrap != null && requestWrap.request == request);
+            if (!removeSuccess) {
+                Request<?> requestWrap = activeList.stream().filter(r -> r.request == request).findFirst().orElse(null);
+                if (requestWrap != null) {
+                    requestWrap.cancel();
+                    activeList.remove(requestWrap);
+                }
             }
         }
     }
