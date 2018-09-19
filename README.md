@@ -25,20 +25,20 @@ Add this in your app's build.gradle file:
 **For Gradle < 3.4**
 
 ```groovy
-compile 'com.hieupt:retrofit2-queue:1.0.1'
+compile 'com.hieupt:retrofit2-queue:1.0.2'
 ```
 
 **For Gradle >= 3.4**
 
 ```groovy
-implementation 'com.hieupt:retrofit2-queue:1.0.1'
+implementation 'com.hieupt:retrofit2-queue:1.0.2'
 ```
 ************* **Using Maven** *************
 ```xml
 <dependency>
   <groupId>com.hieupt</groupId>
   <artifactId>retrofit2-queue</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <type>pom</type>
 </dependency>
 ```
