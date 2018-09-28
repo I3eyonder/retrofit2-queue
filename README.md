@@ -64,17 +64,13 @@ retrofitQueue.addRequestToFrontQueue(Call, Callback);
 ```java
 retrofitQueue.requestNow(Call, Callback);
 ```
-**Cancel requests that executed but not finished yet**
+**Cancel a request**
 ```java
-// cancel all executed request
-retrofitQueue.cancel();
-// or cancel specific request
+// cancel or remove from pending queue a specific request
 retrofitQueue.cancel(Call);
 ```
-**Remove waiting requests**
+**Clear pending requests**
 ```java
 // clear pending queue
 retrofitQueue.clearQueue();
-// or remove specific request
-retrofitQueue.removeRequest(Call);
 ```
